@@ -144,12 +144,15 @@ app.get('/auctions/:id', async (req, res) => {
     if (!auctionItem) 
       return res.status(404).json({ message: 'Auction not found' });
 
+<<<<<<< HEAD
     // Check if auction time has passed and update status
     if (!auctionItem.isClosed && new Date() > new Date(auctionItem.closingTime)) {
       auctionItem.isClosed = true;
       await auctionItem.save();
     }
 
+=======
+>>>>>>> df1169c9deb288991c0467a0f5379b2fbd4d9809
     res.json(auctionItem);
   } catch (error) {
     console.error('Fetching Auction Item Error:', error);
@@ -162,6 +165,7 @@ app.post('/bid/:id', authenticate, async (req, res) => {
   try {
     const { id } = req.params;
     const { bid } = req.body;
+<<<<<<< HEAD
     
     // Convert bid to number
     const bidAmount = parseFloat(bid);
@@ -196,11 +200,30 @@ app.post('/bid/:id', authenticate, async (req, res) => {
     // Validate bid is higher than current bid
     if (bidAmount > item.currentBid) {
       item.currentBid = bidAmount;
+=======
+    const item = await AuctionItem.findById(id);
+
+    if (!item) return res.status(404).json({ message: 'Auction item not found' });
+    if (item.isClosed) return res.status(400).json({ message: 'Auction is closed' });
+
+    if (new Date() > new Date(item.closingTime)) {
+      item.isClosed = true;
+      await item.save();
+      return res.json({ message: 'Auction closed', winner: item.highestBidder });
+    }
+
+    if (bid > item.currentBid) {
+      item.currentBid = bid;
+>>>>>>> df1169c9deb288991c0467a0f5379b2fbd4d9809
       item.highestBidder = req.user.username;
       await item.save();
       res.json({ message: 'Bid successful', item });
     } else {
+<<<<<<< HEAD
       res.status(400).json({ message: `Bid must be higher than current bid of $${item.currentBid}` });
+=======
+      res.status(400).json({ message: 'Bid too low' });
+>>>>>>> df1169c9deb288991c0467a0f5379b2fbd4d9809
     }
   } catch (error) {
     console.error('Bidding Error:', error);
